@@ -1,0 +1,10 @@
+# example res.inp
+
+#f0_mass  = 2.15 1 0 3     # comment 
+#f0_width = 0.0486  0.01 0 1  # comment 
+f0_mass  = 2.15 -1 999 999     # comment 
+f0_width = 0.0486  -1 999 999  # comment 
+f2_mass  = 2.0010 -1 999 999   # comment
+f2_width = 0.133  -1 999 999   # comment 
+f4_mass  = 2.000  -1 999 999   # comment 
+f4_width = 0.03  -1 999 999    # comment 

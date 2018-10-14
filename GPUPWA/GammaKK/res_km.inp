@@ -1,0 +1,22 @@
+# example res.inp
+
+f0_mass  = 2.15 -0.001 2.149 2.151     # comment 
+f0_width = 0.0486  -1 999 999  # comment 
+f2_mass  = 1.85 -1 999 999   # comment
+f2_width = 0.05  -1 999 999   # comment 
+f4_mass  = 2.000  -1 999 999   # comment 
+f4_width = 0.03  -1 999 999    # comment 
+res_f0_1_mass = 2.0 -0.001 1.999 2.001
+res_f0_1_width = 0.3 -1 -500 500
+res_f0_1_mag = 1.0  0.01 0.5 1.5
+res_f0_1_phase = 0.5 0.01 0.3 0.8
+res_f0_2_mass = 2.15 -1 -500 500
+res_f0_2_width = 0.1 -1 -500 500
+res_f0_2_mag = 1.0 -2 0 500
+res_f0_2_phase = 0.6 -0.3 -3.14159 3.14159
+c = 0.0 -2 0 500
+cs = 0.0 -2 0 500
+dx = 0.0 -2 0 500
+dy = 0.0 -2 0 500
+dsx = 0.0 -2 0 500
+dsy = 0.0 -2 0 500

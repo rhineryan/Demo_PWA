@@ -1,0 +1,2 @@
+Fit                    1: Minimum Likelihood : -3701.4364884480237379
+Best Likelihood obtained was: -3701.4364884480237379

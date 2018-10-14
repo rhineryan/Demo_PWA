@@ -1,0 +1,220 @@
+/** \page howtos How to ...
+
+In the following, we try to introduce some of the advanced techniques available in GPUPWA
+
+\section howtofreeresonanceparameters How to perform a fit with free resonance parameters?
+
+Performing a fit with free resonance parameters is actually rather easy; you just do not fix
+all the masses and widths and GPUPWA will take care of the rest. Two things you will however have
+to ensure yourself:
+- The fitter used has to be GPUPartialWaveAnalysis::FITTER::MINUIT or 
+GPUPartialWaveAnalysis::FITTER::MINUITMINOS, as GPUPWA does not yet provide gradients and a 
+Hessian matrix for free parameters.
+- In the current implementation, the higher rank and complex part of amplitued has to be separable.
+This will be changed in a future version.
+
+You will probably notice, that the fit is markedly slower than with fixed resonance paramaters. 
+This is to be expected, as we are recalculating the MC Integral for every single iteration and 
+the MINUIT fitter usually needs many more iterations than FUMILI.
+
+
+\section howtoconstrainaparameter How to constrain a parameter?
+
+Sometimes you have knowledge external to the PWA of the value a certain parameter should take. This knowledge
+can be introduced to the fit in three ways: 
+- By fixing the parameter if you know its exact value (e.g. fixing the very well known phi mass to the 
+PDG value). 
+- By putting limits on the parameter (e.g. limiting a phase to be between 0 and 2*pi, a magnitude to 
+be positive).
+- By adding a likelihood penalty constraint to the parameter (e.g. the rho' width, which is only 
+known with a large uncertainty).
+
+Here we explain how to implement the third type of constraint by using a GPUFitConstraint object. In the case of the rho', the
+PDG quotes the width as 400+-60 MeV. We want to implement this knowledge into the fit, by leaving this width as a free parameter,
+but adding a chi-square like penalty for deviations from 400 MeV to our likelihood.
+\code
+GPUChi2FitConstraint * rhoprimewidth_constraint = new GPUChi2FitConstraint(myanalysis, 4, 0.4, 0.06, 0.5);																		   
+\endcode
+Here we create a GPUChi2FitConstraint object. The arguments to the constructor are the mother partial wave analysis,
+the fit parameter representing the width (here it is number 4), the desired central value (0.4 GeV), the error (sigma)
+on this (0.06 GeV) and the weight whith which the chi-squared should enter the likelihood (the default value is 0.5, i.e.
+a change in chi-squared of 1 corresponds to a change in likelihood of 0.5).
+
+\code
+myanalysis->AddConstraint(rhoprimewidth_constraint);
+\endcode
+Here we add the constraint to our Analysis, and we are done. The rest is taken care of by GPUPWA, which will also report
+the contribution to the likelyhood by this constraint in the fit results.
+
+If you want to implement a constraint that is more complicated than a simple chi-squared, you can do so by deriving your
+constraint class from GPUFitConstraint, taking GPUChi2FitConstraint as an example.
+
+\section howtouseexternalamplitudes How to use external amplitudes?
+GPUPWA is quite powerful, but there may be things it can't (yet) do. For these cases, you might want to import amplitudes,
+tensors or resonance shapes from some other program. GPUPWA can now handle this case via the GPUFileTable class and some
+additional constructors in GPUStreamTensor and the GPUPropagatorFile class.
+
+Here is an example of using a file to input some vectors (e.g. the orbital part of amplitudes in a meson partial wave analysis).
+First create these amplitudes in your external program and write them to a text file with one line per event. If you have five
+amplitudes, you will end up with a file containg 20 columns (4 vector elements * 5 waves) and a line for every event. Then produce
+the same type of file for your Monte Carlo.
+ 
+These files are then taken care of by a GPUFileTable objects:
+\code
+GPUVectorFileTable * myamplitudefile_data = new GPUVectorFileTable("myfancyfilename_Data.txt",5);
+GPUVectorFileTable * myamplitudefile_mc   = new GPUVectorFileTable("myfancyfilename_MC.txt",5);
+\endcode
+the arguments to the constructor are the file name and the number of elements (vectors in this case). Then we
+sould check, whether reading of the files was successful:
+\code
+if(!myamplitudefile_data->ok()){
+	// do some clever error handling
+}
+if(!myamplitudefile_mc->ok()){
+	// do some clever error handling
+}
+\endcode
+We build a few vectors, one with the file table objects and some with column indices.
+\code
+std::vector<GPUFileTable<float4> *> filetablevector;
+filetablevector.push_back(myamplitudefile_data);
+filetablevector.push_back(myamplitudefile_mc);
+
+std::vector<unsigned int> column_0_vector(2,0);
+std::vector<unsigned int> column_1_vector(2,1);
+...
+std::vector<unsigned int> column_4_vector(2,4);
+\endcode
+now we can build GPUStreamTensor objects using the file table:
+\code
+GPUStreamVector & OrbitalAmplitude_0 = * new GPUStreamVector(myanalysis, filetablevector, column_0_vector);
+...
+GPUStreamVector & OrbitalAmplitude_4 = * new GPUStreamVector(myanalysis, filetablevector, column_4_vector);
+\endcode
+the arguments to the constructor are the mother partial wave analysis, the vector of GPUFileTable and a vector of 
+the column indices to use. These GPUStreamVector can then be used as "normal" GPUStreamVector, e.g. as the 
+orbital part of a GPUPartialWave.
+
+There is also the GPUPropagatorFile, which is constructed similarly and takes its information from a GPUComplexFileTable.
+GPUPropagatorFile will not provide derivaties.
+
+Note that if you want to introduce objects of different size (scalars, vectors, complex number etc.), you will
+need separate files and separate GPUFileTable objects for each dimensionality.
+
+Another possibility is to use an external lookup table and fill it into a GPUMainMemoryLookupTable object.
+
+\section howtoaddtensorcode How to add tensor code
+
+The tensor manipulation code in GPUPWA provides all the functionality needed in the analyses implemented so
+far, but of course it is not complete and something additional might be needed. Here is how you add tensor code
+(we use the simple example of adding to vectors here):
+- In GPUComputedTensors.h, define the operation:
+\code
+/// Add two vectors
+GPUStreamVector & operator+  (GPUStreamVector & _lhs, GPUStreamVector & _rhs);
+\endcode
+do not forget to write a brief comment what the operation is supposed to do for doxygen (using "///").
+- In GPUPWA, we make a difference between Stream and Const objects, usually it is desirable to define
+the operation also for const case:
+\code
+/// Add a vector and a float4
+GPUStreamVector & operator+  (GPUStreamVector & _lhs, GPUConstVector & _rhs);
+/// Add a vector and a float4
+GPUStreamVector & operator+  (GPUConstVector & _lhs, GPUStreamVector & _rhs);
+\endcode
+usually, the cases of adding const objects are already taken care of by some templating.
+
+- Then go to GPUComputedTensor.cpp and implement the operator, it has to create the object actually performing the 
+calculation by calling a constructor:
+\code
+GPUStreamVector & operator+  (GPUStreamVector & _lhs, GPUStreamVector & _rhs){
+	return * new GPUTwoStreamOp<float4, GPUStreamVector,GPUStreamVector &,GPUStreamVector &,'+',true,true>(_lhs,_rhs);
+}
+\endcode
+Not surprisingly, the object created is a GPUTwoStreamOp, taking the two operands as parameters - but what are those 
+template parameters? The first one specifies the element in the stream produced (here a vector), the second one is the type of that
+stream (this distinction is necessary, as GPUStreamTensor4 objects actually store 16 float444 streams and not one float4444 stream.
+The nest two template parameters are the types of the arguments, then follows an integer specifying the operation (here we use the 
+charcater code for +) and then two booleans, specifying whether the left and right arguments are streams. Then add the constructors 
+for the case of one of the vectors not being a stream (and because addition is commutative, we create the same type of object, but with
+arguments swapped) - and we directly feed in the float4, not the GPUConstVector:
+\code
+GPUStreamVector & operator+  (GPUStreamVector & _lhs, GPUConstVector & _rhs){
+	float4 temp  = _rhs();
+	return * new GPUTwoStreamOp<float4, GPUStreamVector,GPUStreamVector &,float4,'+',true,false>(_lhs,temp);
+}
+GPUStreamVector & operator+  (GPUConstVector & _lhs, GPUStreamVector & _rhs){
+	float4 temp  = _lhs();
+	return * new GPUTwoStreamOp<float4, GPUStreamVector,GPUStreamVector &,float4,'+',true,false>(_rhs,temp);
+}
+\endcode
+
+- Next step is implementing these templates - most of this is taken care of by the template, but you have to provide the actual operation, namely the operetor():
+\code
+template<> GPUDataStream<float4> * GPUTwoStreamOp<float4, GPUStreamVector,GPUStreamVector &,GPUStreamVector &,'+',true,true>::operator()(int index, int block){
+	this->assertindex(index); 
+	if(this->mstream[index][block]) 
+	      return this->mstream[index][block];
+	Stream<float4> * lstream = this->lhs(index,block);
+	Stream<float4> * rstream = this->rhs(index,block);
+	assert(this->lhs.GetLength(index,block)==this->rhs.GetLength(index,block));
+	this->mstream[index][block] = new GPUDataStream<float4>(mList->GetDeviceInterface(), this->lhs.GetLength(index,block));
+	kerneltensoradd_1_1(mList->GetDeviceInterface(), lstream, rstream, this->mstream[index][block]);
+	this->lhs.DecreaseUsecount(index,block);
+	this->rhs.DecreaseUsecount(index,block);
+	return this->mstream[index][block];
+}
+\endcode
+So what happens here: We provide a template specialization using the parameters specified in the constructor. And then, line by line:
+\code
+	this->assertindex(index);
+\endcode
+Assert thatthe index given by the user is within range.
+\code
+	if(this->mstream[index][block]) 
+	      return this->mstream[index][block];
+\endcode
+This is the caching mechanism: if the mstream at the reuested index and block position already exists, return it, of not, go on to:
+\code
+	Stream<float4> * lstream = this->lhs(index,block);
+	Stream<float4> * rstream = this->rhs(index,block);
+\endcode
+obtain the streams from the arguments, and make sure they have the same length:
+\code
+	assert(this->lhs.GetLength(index,block)==this->rhs.GetLength(index,block));
+\endcode
+Then we create the stream for the result of the calculation:
+\code
+	this->mstream[index][block] = new GPUDataStream<float4>(mList->GetDeviceInterface(), this->lhs.GetLength(index,block));
+\endcode
+We call the kernel - here the GPU will do the actual work:
+\code
+	kerneltensoradd_1_1(mList->GetDeviceInterface(), lstream, rstream, this->mstream[index][block]);
+\endcode
+Then we have to tell the argumets that we have used them, so the cache mechanism can get rid of them if they are no longer
+needed:
+\code
+	this->lhs.DecreaseUsecount(index,block);
+	this->rhs.DecreaseUsecount(index,block);
+\endcode
+And finally, we return the result:
+\code
+	return this->mstream[index][block];
+\endcode
+- So all that is needed now, is writing the kernel (and adding code similar to the above for the case where one of the vectors
+is a const float4 (which I will not show here). So for the kernel, go to the Tensors.cl file and produce the code doing the real work:
+\code
+/* Adding vectors*/
+__kernel void kerneltensoradd_1_1(__global float4 * input1, __global float4 * input2,  __global out float4 * output)
+{
+	 uint i = get_global_id(0);
+	output[i] = input1[i] + input2[i];
+}
+\endcode
+Where things are almost self-expanatory. Note the "out" in front of the output - this is not standard OpenCL, but needed by our
+compiler. the line
+\code
+ uint i = get_global_id(0);
+\endcode
+determines where in the stream we currently are. And that is it.
+**/

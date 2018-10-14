@@ -1,0 +1,6 @@
+  GPUPartialWaveAnalysis * myanalysis = new GPUPartialWaveAnalysis("Gamma Etap Ks Ks Analysis", "./input/files.txt", 2);
+  myanalysis->SetMCIndex(1);
+
+  GPUStreamInputRootFileVector & p1 = * new GPUStreamInputRootFileVector(myanalysis, myanalysis->GetDataFile(), "GamEtapKsKs", "Px_etap", "Py_etap", "Pz_etap", "E_etap");
+  GPUStreamInputRootFileVector & p2 = * new GPUStreamInputRootFileVector(myanalysis, myanalysis->GetDataFile(), "GamEtapKsKs", "Px_ks1", "Py_ks1", "Pz_ks1", "E_ks1");
+  GPUStreamInputRootFileVector & p3 = * new GPUStreamInputRootFileVector(myanalysis, myanalysis->GetDataFile(), "GamEtapKsKs", "Px_ks2", "Py_ks2", "Pz_ks2", "E_ks2");

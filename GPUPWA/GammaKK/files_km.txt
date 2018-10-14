@@ -1,0 +1,6 @@
+# files.txt
+# Example configuration file for ConfigFile class
+ParameterFile = para_km.inp
+ResonanceFile = res_km.inp
+DataFile = data/sample_2_scalars.root
+MCFile1 = data/zeroplustwoplus_phsp_500k_01.root

@@ -1,0 +1,380 @@
+/*
+ * GPUPropagatorType.cpp
+ *
+ *  Created on: Aug 25, 2009
+ *      Author: nberger
+ */
+
+#include "GPUPropagatorType.h"
+#include "GPUDataDependentObjectList.h"
+#include "GPUPartialWaveAnalysis.h"
+#include <cassert>
+
+#ifdef USECPU
+#include "Complex_cpu.h"
+using namespace Complex_CPU;
+#else
+#include "Complex.h"
+using namespace Complex_GPU;
+#endif
+
+
+template <typename T>
+GPUPropagatorType<T>::GPUPropagatorType(GPUPartialWaveAnalysis * ana, char * name, vector<char **>  parnames, unsigned int npar):
+		GPUPropagator(ana, name, parnames, npar),
+		GPUDataDependentObjectType<T>(ana),
+		mImagstream(ana->GetNSets(),std::vector<GPUDataStream<T> * > ()) {
+		for(int i =0; i < ana->GetNSets(); i++){
+			for(int j =0; j < ana->GetNBlocks(i); j++){
+				mImagstream[i].push_back(0);
+			}
+		}
+
+}
+
+//template <>
+GPUPropagatorType<float>::GPUPropagatorType(GPUPartialWaveAnalysis * ana, char * name, vector<char **>  parnames, unsigned int npar):
+		GPUPropagator(ana, name, parnames, npar),
+		GPUDataDependentObjectType<float2>(ana),
+		mrealstream(ana->GetNSets(),std::vector<GPUDataStream<float> * > ()),
+		mimagstream(ana->GetNSets(),std::vector<GPUDataStream<float> * > ()){
+		for(int i =0; i < ana->GetNSets(); i++){
+			for(int j =0; j < ana->GetNBlocks(i); j++){
+				mimagstream[i].push_back(0);
+				mrealstream[i].push_back(0);
+			}
+		}
+
+
+}
+
+template <typename T>
+GPUPropagatorType<T>::GPUPropagatorType(GPUPartialWaveAnalysis * ana,
+		std::vector<char *> names,
+		std::vector<unsigned int *> _Parameters,
+		vector<char **>  parnames):
+		GPUPropagator(ana, names, _Parameters, parnames),
+		GPUDataDependentObjectType<T>(ana),
+		mImagstream(ana->GetNSets(),std::vector<GPUDataStream<T> * > ()) {
+		for(int i =0; i < ana->GetNSets(); i++){
+			for(int j =0; j < ana->GetNBlocks(i); j++){
+				mImagstream[i].push_back(0);
+			}
+		}
+}
+
+//template <>
+GPUPropagatorType<float>::GPUPropagatorType(GPUPartialWaveAnalysis * ana,
+		std::vector<char *> names,
+		std::vector<unsigned int *> _Parameters,
+		vector<char **>  parnames):
+		GPUPropagator(ana, names, _Parameters, parnames),
+		GPUDataDependentObjectType<float2>(ana),
+		mrealstream(ana->GetNSets(),std::vector<GPUDataStream<float> * > ()),
+		mimagstream(ana->GetNSets(),std::vector<GPUDataStream<float> * > ()){
+		for(int i =0; i < ana->GetNSets(); i++){
+			for(int j =0; j < ana->GetNBlocks(i); j++){
+				mimagstream[i].push_back(0);
+				mrealstream[i].push_back(0);
+			}
+		}
+
+
+}
+
+template <typename T>
+GPUDataStream<T> * GPUPropagatorType<T>::realpart(int index, int block){
+	if(CacheValid(index)){
+		if(this->mstream[index][block])
+			return this->mstream[index][block];
+	} else {
+		InvalidateCache(index);
+	}
+
+	calculate(index,block);
+	return this->mstream[index][block];
+}
+
+template <typename T>
+GPUDataStream<T> * GPUPropagatorType<T>::imagpart(int index, int block){
+	if(CacheValid(index)){
+		if(this->mImagstream[index][block])
+			return this->mImagstream[index][block];
+	} else {
+		InvalidateCache(index);
+	}
+
+	calculate(index,block);
+
+	return this->mImagstream[index][block];
+}
+
+
+GPUDataStream<float> * GPUPropagatorType<float>::realpart(int index, int block){
+	if(CacheValid(index)){
+		if(this->mrealstream[index][block])
+			return this->mrealstream[index][block];
+	} else {
+		InvalidateCache(index);
+	}
+
+	calculate(index,block);
+
+	return this->mrealstream[index][block];
+}
+
+
+GPUDataStream<float> * GPUPropagatorType<float>::imagpart(int index, int block){
+
+	if(CacheValid(index)){
+		if(this->mimagstream[index][block])
+			return this->mimagstream[index][block];
+	} else {
+		InvalidateCache(index);
+	}
+
+	calculate(index,block);
+	return this->mimagstream[index][block];
+}
+
+
+template <typename T>
+T * GPUPropagatorType<T>::Read(int index){
+	/*assert(index < (int)this->mstream.size());
+	int totallength = 0;
+	for(int i=0; i< (int)this->mstream[index].size(); i++){
+		if(!this->mstream[index][i])
+			(*this)(index,i);
+		assert(this->mstream[index][i]);
+		totallength += this->GetLength[index][i];
+	}
+	T * temp = new T[totallength];
+	for(int i=0; i< (int)this->mstream[index].size(); i++){
+		this->mstream[index][i]->write(temp+i*GPUDataDependentObject::Blocksize);
+	}*/
+	assert(0);
+	return 0;
+}
+
+//template <>
+float2 * GPUPropagatorType<float>::Read(int index){
+	assert(index < (int)mstream.size());
+	int totallength = 0;
+	for(int i=0; i< (int)mstream[index].size(); i++){
+		if(!mstream[index][i])
+			(*this)(index,i);
+		assert(mstream[index][i]);
+		totallength += GetLength(index,i);
+	}
+	float2 * temp = new float2[totallength];
+	for(int i=0; i< (int)mstream[index].size(); i++){
+		mstream[index][i]->Read(temp+i*GPUDataDependentObject::Blocksize);
+	}
+	return temp;
+}
+
+template <typename T>
+T * GPUPropagatorType<T>::ReadBlock(int index, int block){
+/*	assert(index < (int)this->mstream.size());
+	bool uc = false;
+	if(!this->mstream[index][block]){
+		this->IncreaseUsecount(index,block);
+		(*this)(index,block);
+		uc = true;
+	}
+	assert(this->mstream[index][block]);
+	T* temp = new T[this->mlength[index][block]];
+	this->mstream[index][block]->write(temp);
+	if(uc)
+		this->DecreaseUsecount(index,block);
+	return temp;*/
+	assert(0);
+	return 0;
+}
+
+//template <>
+float2 * GPUPropagatorType<float>::ReadBlock(int index, int block){
+	assert(index < (int)mstream.size());
+	bool uc = false;
+	if(!mstream[index][block]){
+		IncreaseUsecount(index,block);
+		(*this)(index,block);
+		uc = true;
+	}
+	assert(mstream[index][block]);
+	float2 * temp = new float2[GetLength(index,block)];
+	mstream[index][block]->Read(temp);
+	if(uc)
+		DecreaseUsecount(index,block);
+	return temp;
+}
+
+//template <>
+ void GPUPropagatorType<float>::Print(int nelements, std::ostream & output, int index, int block){
+	float2 * data;
+	data = ReadBlock(index, block);
+	if(nelements < 1)
+		nelements = GetLength(index,block);
+	output << "_______________________" << endl;
+	for(int i=0; i < nelements; i++)
+		output << "    (" << data[i].x << ", " << data[i].y << ")" << endl;
+	output << "_______________________" << endl;
+	delete data;
+}
+
+template <typename T>
+void GPUPropagatorType<T>::Reset(int index) {
+	//cout << "Reseting at index " << index << endl;
+	GPUDataDependentObjectType<T>::Reset(index);
+	if(index < (int)mImagstream.size()){
+		for(int i=0; i < (int)mImagstream[index].size(); i++){
+				if(mImagstream[index][i])
+				delete mImagstream[index][i];
+			mImagstream[index][i] =0;
+		}
+	}
+};
+
+
+//template <>
+void GPUPropagatorType<float>::Reset(int index) {
+	//cout << "Reseting at index " << index <<", "<<(int)mrealstream.size()<<", "<< (int)mimagstream.size()<< endl;
+	GPUDataDependentObjectType<float2>::Reset(index);
+	if(index < (int)mrealstream.size()){
+		for(int i=0; i < (int)mrealstream[index].size(); i++){
+				if(mrealstream[index][i])
+				delete [] mrealstream[index][i];
+			mrealstream[index][i] =0;
+		}
+	}
+
+	if(index < (int)mimagstream.size()){
+		for(int i=0; i < (int)mimagstream[index].size(); i++){
+				if(mimagstream[index][i])
+				delete [] mimagstream[index][i];
+			mimagstream[index][i] =0;
+		}
+	}
+};
+
+template <typename T>
+void GPUPropagatorType<T>::InvalidateCache(unsigned int index) {
+	for(int i=0; i < (int)this->mstream[index].size(); i++){
+		if(this->mstream[index][i])
+			delete this->mstream[index][i];
+		this->mstream[index][i] =0;
+	}
+	for(int i=0; i < (int)mImagstream[index].size(); i++){
+		if(mImagstream[index][i])
+			delete mImagstream[index][i];
+		mImagstream[index][i] =0;
+	}
+	GPUParameterDependentObject::InvalidateCache(index);
+};
+
+
+void GPUPropagatorType<float>::InvalidateCache(unsigned int index) {
+	for(int i=0; i < (int)mstream[index].size(); i++){
+		if(mstream[index][i])
+			delete mstream[index][i];
+		mstream[index][i] =0;
+	}
+	for(int i=0; i < (int)mrealstream[index].size(); i++){
+		if(mrealstream[index][i])
+			delete mrealstream[index][i];
+		mrealstream[index][i] =0;
+	}
+	for(int i=0; i < (int)mimagstream[index].size(); i++){
+		if(mimagstream[index][i])
+			delete mimagstream[index][i];
+		mimagstream[index][i] =0;
+	}
+	GPUParameterDependentObject::InvalidateCache(index);
+};
+
+template <typename T>
+void GPUPropagatorType<T>::Reset(int index, int block) {
+	//cout << "Reseting at index " << index << ", block " << block << endl;
+	GPUDataDependentObjectType<T>::Reset(index, block);
+	if(block > -1){
+		if(index < (int)mImagstream.size()){
+			if(mImagstream[index][block])
+				delete mImagstream[index][block];
+			mImagstream[index][block] =0;
+		}
+	} else {
+		if(index < (int)mImagstream.size()){
+			for(int block =0; block < (int)mImagstream[index].size(); block++){
+				if(mImagstream[index][block])
+					delete mImagstream[index][block];
+				mImagstream[index][block] =0;
+			}
+		}
+	}
+};
+
+
+//template <>
+void GPUPropagatorType<float>::Reset(int index, int block) {
+	//cout << "Reseting at index " << index << ", block " << block <<", "<<(int)mrealstream.size()<<", "<< (int)mimagstream.size()<< endl;
+	GPUDataDependentObjectType<float2>::Reset(index, block);
+	if(block > -1){
+		if(index < (int)mrealstream.size()){
+			if(mrealstream[index][block])
+				delete [] mrealstream[index][block];
+			mrealstream[index][block] =0;
+		}
+
+		if(index < (int)mimagstream.size()){
+			if(mimagstream[index][block])
+				delete [] mimagstream[index][block];
+			mimagstream[index][block] =0;
+		}
+	} else {
+		if(index < (int)mimagstream.size()){
+			for(int block =0; block < (int)mimagstream[index].size(); block++){
+				if(mrealstream[index][block])
+					delete [] mrealstream[index][block];
+				mrealstream[index][block] =0;
+				if(mimagstream[index][block])
+					delete [] mimagstream[index][block];
+				mimagstream[index][block] =0;
+			}
+		}
+	}
+};
+
+template <typename T>
+bool GPUPropagatorType<T>::isVector(){return (sizeof(T)==   4*sizeof(float));};
+template <typename T>
+bool GPUPropagatorType<T>::isTensor2(){return (sizeof(T)== 16*sizeof(float));};
+template <typename T>
+bool GPUPropagatorType<T>::isTensor3(){return (sizeof(T)== 64*sizeof(float));};
+template <typename T>
+bool GPUPropagatorType<T>::isTensor4(){return (sizeof(T)==256*sizeof(float));};
+
+//template <>
+void GPUPropagatorType<float>::calculate(int index, int block){
+	GPUDataStream<float2> * comp = operator()(index, block);
+	if(!mrealstream[index][block])
+		mrealstream[index][block] = new GPUDataStream<float>(mList->GetDeviceInterface(), GetLength(index,block));
+	if(!mimagstream[index][block])
+		mimagstream[index][block] = new GPUDataStream<float>(mList->GetDeviceInterface(), GetLength(index,block));
+	kernelcomplexsplit(mList->GetDeviceInterface(), comp, mrealstream[index][block], mimagstream[index][block] );
+}
+
+
+template <typename T>
+GPUPropagatorType<T>::~GPUPropagatorType() {
+}
+
+//template <>
+GPUPropagatorType<float>::~GPUPropagatorType() {
+}
+
+
+
+template class GPUPropagatorType<float>;
+template class GPUPropagatorType<float4>;
+template class GPUPropagatorType<float44>;
+template class GPUPropagatorType<float444>;

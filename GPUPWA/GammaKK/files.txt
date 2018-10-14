@@ -1,0 +1,6 @@
+# files.txt
+# Example configuration file for ConfigFile class
+ParameterFile = para.inp
+ResonanceFile = res.inp
+DataFile = data/data.root
+MCFile1 = data/phsp.root

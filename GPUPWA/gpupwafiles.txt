@@ -1,0 +1,73 @@
+/**
+\page gpupwafiles In- and Output Files used by GPUPWA
+
+\section inputfiles Input Files
+
+\subsection resinp Resonance Parameter Input File
+
+The resonance input file, ususally called res.inp could look like this:
+\code
+# res.inp
+# Example configuration file for resonances
+
+f0  = 2.15 0.0486    1        # comment
+f2  = 2.0010 0.133   1        # comment
+f4  = 2.0010 0.133   1        # by wangjk
+\endcode
+As you can see, comments are started with a #. The description of a 
+resonance begins wih a resonance name; after the = sign follow the
+resonance mass, width and type, wherby type is currently not used.
+
+
+\subsection parainp Fit Parameter Input File
+
+The parameter input file, usually called para.inp, might look like this:
+\code
+# para.inp
+# Example configuration file for parameters 
+bg_mag = 10.0 -50 0 500
+
+f0_mag = 2.26 2 0 500
+f0_phase = 1.11 0.3 -3.14159 3.14159
+
+f20_mag = 1 2 0 500
+f20_phase = 1.0 -0.3 -3.14159 3.14159
+
+f21_mag = 0.03 2 0 500
+f21_phase = 1.0 -0.3 -3.14159 3.14159
+
+f22_mag = 0.2 2 0 500
+f22_phase = 1.0 -0.3 -3.14159 3.14159
+\endcode
+Again, comments are started with a #. A fit paramater is introduced by its name,
+followed by the = sign and then
+- the initial value of the paramater,
+- the initial error of the parameter (used as a stepsize by certain minimizers); if the initial error is negative, GPUPWA will fix the corresponding fit parameter,
+- the lower limit for the parameter. If this value is set to 999, no lower limit is set,
+- the upper limit for the parameter. If this value is set to 999, no upper limit is set.
+
+\subsection filefile File Input File
+
+In a future version, GPUPWA will read file names and related information from a file.inp input file.
+
+\section outputfiles Output Files
+
+For every sucessful fit, GPUPWA creates a fitresult_<Analysisname>_<fitnumber>.txt file, whose contents
+should be self explanatory and encompass the used wave set, input and output parameters and some fit statistics.
+If a series of fits is run, a multifitresult_<Analysisname>_<fitnumber of first fit>.txt file is created,
+listing the minimum likelihoods in each fit.
+
+GPUPlotset can produce root and postscript files with plots.
+
+If GPUPWA is compiled with the -pg option, a gmon.out file will be generated for each run, which can be used for
+profiling with the gprof program.
+
+\section internalfiles Files used by GPUPWA for its own Happyness
+
+GPUPWA will also generate an \<Analysisname\>_Amplitude_MC_Integral with coefficients for the MC integral. 
+If you do not intend to fiddle with resonance parameters, the coefficients do not have to be recalculated
+for each program run and can be read from tha file.
+There is also an \<Analysisname\>.cnt file, which is used to sequentially number program runs and fits. If you
+wish to reset those counters, just delete this file.
+
+*/

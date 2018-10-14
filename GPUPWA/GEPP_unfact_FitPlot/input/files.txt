@@ -1,0 +1,23 @@
+# files.txt
+# Example configuration file for ConfigFile class
+ParameterFile = ./input/para.inp
+ResonanceFile = ./input/res.inp
+DataFile =/besfs/groups/psip/psipgroup/user/xiongxa/GamEtaPi0Pi0/Alg_gg_xl/GPUPWA/gpupwa2.1_1/Bin_Bin_more_phsp/Event_by_event/data/data.root
+MCFile1 = /besfs/groups/psip/psipgroup/user/xiongxa/GamEtaPi0Pi0/Alg_gg_xl/GPUPWA/gpupwa2.1_1/Bin_Bin_more_phsp/Event_by_event/data/phsp.root
+
+#
+OPERATION = FIT
+#OPERATION = PROJECTION
+#OPERATION = MCINTEGRAL
+#FITTER = OLDFUMILI 
+FITTER = MINUITDoFit
+
+#
+NSG = 30000
+WSG = 1
+NSB1 = 0
+WSB1 = 1
+
+#
+SPREAD = 5
+NFIT = 100

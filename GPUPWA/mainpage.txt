@@ -1,0 +1,230 @@
+/* This file is used for generating the doxygen documentation.
+You can read it as such, but it looks much nicer after doxygen
+processing. */
+
+/**
+\mainpage GPUPWA
+<center> 
+<b> A Framework for Partial Wave Analysis using Graphics Processors <br><br>
+by <br>
+Niklaus Berger, Wang Jike and Liu Beijiang <br>
+Institute for High Energy Physics, Beijing </b>
+</center>
+
+\section intro Introduction
+
+GPUPWA is a framework for partial wave analysis (PWA), which attempts to speed up 
+the calculations involved by harnessing the powers of graphics processing units
+(GPUs). The idea behind the framework is to provide a C++ interface to
+covariant Tensor manipulation and PWA fits without bothering the user with GPU
+internals.
+
+\section aboutdoc About this Document
+
+This document on one hand contains detailed doxygen class documenttion of almost all the
+GPUPWA code. This is however not very fluid 
+reading, so after you have installed everything (which is quite a task, see the
+\ref installation instructions), you best start with working through our commented
+\ref example which shows you how the code is intended to be used and what GPUPWA 
+can do right now. In the \ref example you will also find hyperlinks to the 
+documentation of the classes you will be using.
+
+For some of the advanced functionalities not covered in the example, check out the \ref howtos page.
+
+If you wonder, what input files GPUPWA programs generally require and what output they 
+produce, check the \ref gpupwafiles page.
+
+\section new21 New in Release 2.1
+Major refactoring of the code, making it more generic; parameter handling much simplyfied. Note that this release will break user code. 
+Details in the \ref changelog. Please note that \ref installation is now different.
+
+\section new20 New in Release 2.0
+Now using OpenCL and supporting 64-bit machines and multi-GPU machines. Details in the \ref changelog.
+Please note that \ref installation is now different.
+
+\section new19 New in Release 1.9
+Added a facility to write amplitudes to a file (and to use them to produce a MC from phasespace MC using a root script.
+Also added more complex math, handling of higher rank complex tensors in the GPURadiative3MesonsPartialWaveAnalyis.
+Fixed a few bugs in calculations. See the \ref changelog for details.
+
+\section new18 New in Release 1.8
+The main changes in release 1.8 are support for math with complex numbers (and higher rank tensors, currently not all 
+operations are available) and support for weighted MC. In addition, the caching mechanism underwent a major refactoring
+and more sums are done on the GPU. Also there is support for 2D plots. See the \ref changelog for details. Also the complete
+code is now included in the documentation and I have started describing the inner workings of GPUPWA on the \ref interna page.
+
+\section new17 New in Release 1.7
+Release 1.7 brings supoort for fits with free resonance parameters (as yet without analytic gradients and Hessians),
+reading amplitudes, propagators etc. from files, an additional fit method and fixes a large number of bugs. See 
+\ref changelog for details. This documentatiom now includes all the GPUPWA classes, including those not considered 
+part of the user interface.
+
+\section new16 New in Release 1.6
+
+Release 1.6 brings support for the ATI Stream SDK 1.4 and fixes various bugs; details in the 
+\ref changelog.
+
+\section new15 New in Release 1.5
+
+Release 1.5 finally brings full and fast support for rank 4 tensors and improvements for
+rank 3 tensors. In addition, the memory management on the GPU was much improved, using a 
+sophisticated caching mechanism, allowing for larger data and MC samples. Details in the
+\ref changelog.
+
+\section new14 New in Release 1.4
+
+Release 1.4 is a bug fix release introducing a workaround for the slowdon issues introduced
+with Brook+ 1.3 and some minor fixes. Performance is comparable to release 1.2, a fix of the 
+Brook+ problems (instead of the workaround) should lead to a sizeable speedup. Details in the
+\ref changelog.
+
+\section new13 New in Release 1.3
+
+The full list of  changes with regard to previous versions can be found at the \ref changelog.
+The backend was adapted to Brook+ 1.3 (which is now required), which introduces type safe 
+stream and thus allowed to fix a whole series of bugs. Unfortunately, Brook+ 1.3 has several
+memory leaks, which slows down the code after a few Kernel calls. AMD is aware of this issue
+and a fix should be forthcoming.
+
+Also, there are now functions to try randomly varied initial parameters 
+(GPUPartialWaveAnalysis::DoMultiFit()) and to scan parameters (GPUPartialWaveAnalysis::ScanParameter()).
+
+
+\section limitations Known Bugs and Limitations
+
+- GPUPWA has to be adjusted to the GPU memory and and analysis size manually.
+**/
+
+/**
+\page installation Installation
+
+GPUPWA now uses the OpenCL framework to interface recent GPUs by AMD/ATI. Support for other 
+vendors will be added, as soon as corresponding hardware becomes available.
+For file I/O, plotting and fitting it relies on root. Before you obtain GPUPWA, you
+have to get your system ready for GPU based computations. We have tested GPUPWA on
+systems running Scientific Linux Cern 5.2 (other SL 5 versions should be ok as well)
+and with ATI Radeon HD 4870 and 5870 cards. Both 32-bit and 64-bit architectures are supported.
+
+\section driverinstall Installing the Catalyst Driver
+After installing Linux (make sure you install the "legacy development" package but not the
+"virtualization" package), get and install the Catalyst driver from AMD/ATI (if your machine
+has an ATI GPU or no high-end GPU - for NVIDIA, follow their instructions). Currently
+we suggest <a href="http://support.amd.com/us/gpudownloads/linux/previous/Pages/radeon_linux.aspx"> 
+version 11.4.</a> After installing the driver, run the inital configuration utility (with
+root priviledges, ">" is supposed to be your command prompt):
+\code
+> aticonfig -- initial
+\endcode
+and reboot your machine. If after the reboot, the X-Server fails to load, this might
+be due to the fact that you have a wide screen. Find out your screen resolution, if 
+it is e.g. 1440 x 900, go to a console and (again as root) do:
+\code 
+> aticonfig --resolution=0,1440x900
+\endcode
+and reboot again. If you now enter
+\code
+> fglrxinfo
+\endcode
+the output should look like this
+\code
+display: :0.0  screen: 0
+OpenGL vendor string: ATI Technologies Inc.
+OpenGL renderer string: ATI Radeon HD 4800 Series
+OpenGL version string: 3.3.10666 Compatibility Profile Context
+\endcode
+If instead of ATI, Mesa shows up, the driver is not installed correctly. This could be 
+due to the virtualization beeing enabled during the Linux installation.
+
+\section rootinstall Installing root
+
+The next step is obtaining and installing <a href="root.cern.ch">root</a>. For this 
+please follow the instructions on the root website. Make sure that you have the
+root environment variables set correctly (add them to you login script...). 
+Please note that if you compile root from source, the Minuit2 package is 
+not automatically as well. Thus you have to go
+the $ROOTSYS/math/minuit2 directory and do the following:
+\code
+> build/setup.sh
+> ./configure
+> make
+> make install
+\endcode
+For reasons unknown to me, this puts the corresponding library (libMinuit) into the
+/usr/local/lib/ directory, We would however like to have it at $ROOTSYS/lib. Thus
+place a soft link to the library in that directory:
+\code
+> cd $ROOTSYS/lib
+> ln -s /usr/local/lib/libMinuit2.so
+> ln -s /usr/local/lib/libMinuit2.so.0
+\endcode
+
+Minuit 2 has a little inconsistency in one of the header files, which we need to fix.
+Open the file $(ROOTSYS)/math/minuit2/inc/Minuit2/FumiliFCNBase.h and go to line
+160:
+\code
+// define these data members protected because can be modified by the derived classes
+private:
+   unsigned int fNumberOfParameters;
+   double fValue;
+   std::vector<double> fGradient;
+   std::vector<double> fHessian;
+\endcode
+change this to
+\code
+// define these data members protected because can be modified by the derived classes
+protected:
+  unsigned int fNumberOfParameters;
+   mutable double fValue;
+   mutable std::vector<double> fGradient;
+   mutable std::vector<double> fHessian;
+\endcode
+As this is just a header file, you will not need to recompile.
+
+\section streaminstall Installing AMD APP SDK
+
+Next you need to download and install the AMD APP SDK (the name changes more frequently than the version). Currently 
+version 2.4 is working with our code. You 
+can get it from  <a href="http://developer.amd.com/gpu/AMDAPPSDK?Pages/default.aspx">here</a>.
+Untar the package, then run the installer (replace '32' with '64' on 64-bit systems):
+\code
+> tar -xvf AMD-APP-SDK-v2.4-lnx32.tgz
+> mv AMD-APP-SDK-v2.4-lnx32.tgz /usr/local/
+\endcode
+/usr/local is the default path, but you can choose any one that suits you. Then set the environment
+variables (and add them to your login script or a script you cal before beginning GPUPWA work).
+\code
+> export AMDAPPSDKROOT=/usr/local/AMD-APP-SDK-v2.4-lnx32
+> export export AMDAPPSDKSAMPLESROOT=/usr/local/AMD-APP-SDK-v2.4-lnx32
+> export LD_LIBRARY_PATH=$AMDAPPSDKROOT/lib/x86:$LD_LIBRARY_PATH
+\endcode
+or, on 64-bit systems
+\code
+> export LD_LIBRARY_PATH=$AMDAPPSDKROOT/lib/x86_64:$LD_LIBRARY_PATH
+\endcode
+If you are using a different flavour of shell, that might look slightly different.
+And finally, you have to register the OpenCL driver, for this you do (as root)
+\code
+tar xfz icd-registration.tgz
+\endcode
+
+\section cvsco Checking out GPUPWA
+
+GPUPWA is available through cvs. In a directory of your choice do (zshell):
+\code
+> export CVS_RSH=ssh
+> export CVSROOT=lxslc:/afs/ihep.ac.cn/users/n/nberger/cvs
+> cvs co GPUPWA
+\endcode
+Now tell the system where GPUPWA is
+\code
+> export GPUPWA=<base directory>/GPUPWA
+\endcode
+In general, for compiling and running GPUPWA based programs, the following environment variables 
+are required to be pointing to the relevant directories:
+- GPUPWA
+- AMDAPPSDKROOT
+- ROOTSYS
+If they are ok, change to the GPUPWA directory and type make. 
+Grab a coffe or tea and hope all goes well... 
+**/
+
