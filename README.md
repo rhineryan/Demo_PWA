@@ -15,5 +15,5 @@
 ## 5.[IO-check](./IOcheck)
 ## 6.[质量宽度扫描](./Scan)
 ## 7.[统计误差计算](./Stat_uncertainty)
-## 8.[计算fraction](./fraction)
-## 9.[自动化作图](./plot)
+## 8.[计算fraction](./Fraction)
+## 9.[自动化作图](./Plot)
