@@ -1,4 +1,13 @@
 # Demo for PWA in GPUPWA
+===========================
+
+****
+	
+|Author|xian xiong|
+|---|---
+|E-mail|xxa2010@126.com
+****
+
 ## 1.[GPUPWA环境安装](./EvenSet)
 ## 2.[第一个PWA例子](./GPUPWA)
 ## 3.[自动寻找基础解](./GPUPWA)
