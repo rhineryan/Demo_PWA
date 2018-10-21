@@ -1,4 +1,4 @@
-# Demo for PWA in GPUPWA
+# GPUPWA环境设置
 ===========================
 
 ****
@@ -8,12 +8,7 @@
 |E-mail|xxa2010@126.com
 ****
 
-## 1.[GPUPWA环境安装](./EvenSet)
-## 2.[第一个PWA例子](./GPUPWA)
-## 3.[自动寻找基础解](./GPUPWA)
-## 4.[Bin by Bin PWA](./Bin_by_Bin)
-## 5.[IO-check](./IOcheck)
-## 6.[质量宽度扫描](./Scan)
-## 7.[统计误差计算](./Stat_uncertainty)
-## 8.[计算fraction](./fraction)
-## 9.[自动化作图](./plot)
+## 1.系统安装
+## 2.基本软件安装
+## 3.GPUPWA环境设置
+## 4.前台例子测试
