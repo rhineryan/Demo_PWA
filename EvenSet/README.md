@@ -135,3 +135,4 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 		2. ./gammakk
 		3. 正常结束，输出信息
 		
+### 后台作业提交可以参考本目录下的 gpupwa_getting_started.pdf 
