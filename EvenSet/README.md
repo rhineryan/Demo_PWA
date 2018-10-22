@@ -52,5 +52,19 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 3. 检查驱动是否安装成功
 
 	1.cat /proc/driver/nvidia/version
+4. CUDA
+	1. lspci | grep -i nvidia 查看显卡型号(一般都支持CUDA)
+	2. uname -m && cat /etc/*release 查看系统版本(一般也是支持CUDA的)
+	3. uname –r 查看kernel版本
+	4. 官网下载CUDA(链接为CUDA8.0的 我们选对应kernel的你安装SLC对应的REDHAT版本的runfile)
+	5. sudo sh cuda_8.0.61_375.26_linux.run 然后按引导安装
+	7. 检查安装是否成功
+		1. Step1. 添加环境变量到.bashrc(然后source)
+			1. export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CUDAROOT}/lib64:/usr/local/lib
+			2. export PATH=${PATH}:${CUDAROOT}/bin:
+		2. Step2.检查
+			1. nvcc –V    输出CUDA的版本信息 (输出正常即安装成功)
+
+
 
 ### AMD卡
