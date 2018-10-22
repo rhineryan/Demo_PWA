@@ -31,11 +31,15 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 
 	3. 屏蔽Nouveau(由第三方为NVIDIA显卡开发的一个开源3D驱动)
 
-	4. Step1.把驱动加入黑名单: vim /etc/modprobe.d/blacklist.conf ，在文件后面加入blacklist nouveau
-
-	5. Step2.备份与重建initramfs: mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).img.bak
+	4. Step1.把驱动加入黑名单: 
 	
-	dracut -v /boot/initramfs-$(uname -r).img $(uname -r)
+		1. vim /etc/modprobe.d/blacklist.conf ，在文件后面加入blacklist nouveau
+
+	5. Step2.备份与重建initramfs: 
+	
+		1. mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).img.bak
+	
+		2. dracut -v /boot/initramfs-$(uname -r).img $(uname -r)
 
 	6. Step3.重启系统至文本格式
 
