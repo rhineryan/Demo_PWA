@@ -71,6 +71,20 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 	3. make -j4 (调用4核心编译)
 	4. Minuit2 (按下图所示修改，保险起见改完再去root第一级目录下编译一遍)
 	![](https://github.com/rhineryan/Demo_PWA/blob/master/EvenSet/root_minuit.png)
-
+6. 编译GPUPWA
+	1. clone当前目录下的所有文件
+	2. 修改envset文件
+	export ROOTSYS= （你root的安装目录）
+	export CUDAROOT=/usr/local/cuda-8.0 （你CUDA的安装目录）
+	export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CUDAROOT}/lib64:${ROOTSYS}/lib:/usr/local/lib
+	export PATH=${PATH}:${CUDAROOT}/bin:$ROOTSYS/bin:
+	export GPUPWA= （你存放GPUPWA的目录）
+	export GPUPWA_GPU_NR=0
+	export DISPLAY=0.0
+	export _NVIDIA=1
+	3. source envset
+	4. make clean； make
+	5. 编译大概需要20分钟，如果一切顺利，将不会有报错信息。
+	
 ### AMD卡
 
