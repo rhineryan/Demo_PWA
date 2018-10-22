@@ -98,3 +98,10 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 	
 ### AMD卡
 
+1. AMD卡驱动
+2. AMD APP ADK 
+
+目前GPUPWA使用的版本是AMDAPPSDK-2.9-1 ，官网没找到下载链接。可以去这个网站下载。[AMDAPPSDK2.9](http://hc.csdn.net/resources/resource_detail?id=13)
+
+安装AMDAPPSDK参照官方文档。[安装文档](http://developer.amd.com/wordpress/media/2012/10/AMD_APP_SDK_Installation_Notes2.pdf)
+	
