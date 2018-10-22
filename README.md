@@ -9,7 +9,7 @@
 ****
 
 ## 1.[GPUPWA环境安装](./EvenSet)
-## 2.[第一个PWA例子](./GPUPWA)
+## 2.[第一个PWA例子](./EvenSet/GammaKK)
 ## 3.[自动寻找基础解](./GPUPWA)
 ## 4.[Bin by Bin PWA](./Bin_by_Bin)
 ## 5.[IO-check](./IOcheck)
