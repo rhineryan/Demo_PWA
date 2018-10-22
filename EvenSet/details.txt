@@ -1,0 +1,119 @@
+/* This file is part of the doxygen documentation and best read after doxygen processing */
+
+/** \page interna Internal Workings of GPUPWA
+
+\section internaintro Introduction
+
+In GPUPWA, all calculations indexing over events are performed on the GPU, using the OpenCL
+framework via a narrow \ref openclinterface. As far as techniques and memory organisation go, the
+code is split into two main parts, namely \ref tensorsandcache and \ref amplitudecalculation.
+The distinction is somewhat blurred in the case of free resonance parameters, where parts of the
+amplitudes are recalculated for everey event.
+
+\section openclinterface Interface to OpenCL
+
+The interface between GPUPWA and OpenCL is relatively narrow, modelled on the Brook+ interface we
+used earlier. Eeverything that directly uses OpenCL is located in the Opencl_interface directory. The
+exception to this is the extensive use of vector data types such as float4 and double2 all over the 
+framework. The interface to OpenCL happens via the DeviceInterface class, which prepares and handles
+the environment and the Stream class, which holds data in the GPU memory and reads and writes it.
+Opeerations on the GPU are performed by Kernels, which are defined in .cl files. These .cl contain
+standard C code with OpenCL extensions and two extensions pertaining to GPUPWA: Output/return parameters
+in kernles are marked with out and C++-style comments are allowed (OpenCL ony supports C-style comments).
+
+Our own precompiler, contained in the Compiler.cpp file and compilekernels executable takes a .cl
+file, parses it, strips it of comments and the out statements and then has it compiled by the standard
+OpenCL compiler. The resulting binary files are written to the _common/binfiles directory. In addition,
+header and code (.cpp) files are placed in the _common files which automate the loading of the binary
+files and allow for C++ calls to kernels.
+
+An additional executable is makesumkernels, compiled form Makesumkernels.cpp, which generates OpenCL
+code for summing over streams, essentially by repeated 16-foldings.
+
+\section tensorsandcache Tensor manipulations and the caching mechanism
+
+The calculations for obtaining amplitudes and propagators are all only performed when needed
+and automatically cached. In order to allow for global resets and to ensure consistency in event
+numbers between objects, they are all GPUDataDependentObject s, registered in the GPUPartialWaveAnalysis,
+which is derived from GPUDataDependentObjectList. The first registered objects should be the input 4-vectors,
+after the reading of which the GPUDataDependentObjectList will know the event number for each data sample.
+The data samples in turn are split into Blocks of lenght GPUDataDependentObject::Blocksize. In all calculations,
+the outemost loop should be over these blocks, thus allowing for the caching of all intermediate results 
+even with limited memory. If you get "out-of-memory" errors (the program detects these and will stop in an
+assert statement), reduce the Blocksize. 
+
+Constructing Tensors, propagators and other data dependent objects in the user program (or anywhere else) will
+not perfor the calculation, but set up an object with pointers to the argument object, so if C = A + B, C will
+be an object (e.g. A GPUTwoStreamOp) with pointers to A and B. A and B in tur will contain pointers to their
+argument objects and so on, until we hit a constant object such a as the metric tensor or an input vector 
+(a GPUStreamInputVector).
+
+Before the result of a calculation is needed, call GPUDataDependentObject::IncreaseUsecount() on it. This will increase
+a counter for the object and all its argument objects by 1 (note that the usecount is usually increased for one complete
+data set and then decreased blockwise). Then obtain the results by calling the () operator of the object. Calling the ()
+operator of any object with arguments will set up a stream (including the allocation of GPU memory) to contain the 
+results of the calculation, call the () operators of the argument objects, then perform the actual 
+calculation by calling the corresponding kernel(s). After this, the usecount of the argument objects is reduced. If the
+usecount of an object reaches 0, the cached streams are deleted. Note that for the object under discussion itself, the
+result stream remains in memory, until either another object decreases its usecount to 0 or a GPUDataDependentObject::Reset()
+is performed.
+
+\section amplitudecalculation Amplitude calculation
+
+In the amplitude calculation (performed in GPUPWAAmplitudeCalculator), a log likelihood for the current set of 
+parameters is calculated and returned to the fitter. If necessary, also derivatives and the Hessian matrix in 
+the Fumili-approximation are generated.
+
+In a first step, the Monte Carlo integration is performed. For every pair of waves, the tensor and propagator part are
+contracted (sometimes using additional factors such as g_perp_perp in the case of the GPURadiativeMesonsPartialWaveAnalysis.
+The GPUMesonPartialWaveAnalysis also handles waves with no Tensor part and a complex vector in the Propagator part.
+Functionality for handling these cases needs to be extended.
+The complex numbers obtained thus are summed over all MC events (summation is a functionality of GPUSummableDataStream,
+which works with static streams to store intermediate results and performs a series of 16-foldings before transferring data
+back to the CPU memory). The resulting (N_wave * (N_wave+1))/2 complex numbers are written to a file and can be reused
+for future fits.
+
+Before the first fit iteration, the above process is repeated for the data, but without the summing. Instead, the event 
+wise coefficients are copied from the GPU to main memory (this could probably be improved...) and then reordered.
+Now we use separate data structures for the real and imaginary parts and fit 4 events into a 4-vector (float4). The
+data structures are 2D arrays of maximum length GPUDataStream::DIMSIZE and width (N_wave * (N_wave+1))/2, again
+representing the upper right part of the coefficient matrix. As every entry is a 4-vector, 4*GPUDataStream::DIMSIZE events fit into 1 block.
+In addition, a variety of index streams to navigate these structures and to perform sums are created.
+
+In every fit iteration, first the current fit parameters are obtained (the fitters will update them) and filled into
+GPUDataStream structures on the GPU, both in polar form (for the gradients) and cartesian form (for the likelihood).
+Then the normalisation integral (the total cross section) is calculated from the MC coefficients obtained above and the
+current fit parameters; as this does not involve a sum over events, it is performed entierly on the CPU (see
+GPUPWAAmplitudeCalculator::TotalXSection()). In the next step, the likelihood is calculated by the pwamult4 kernel. Note that
+one instance of the kernel will process 4 events, as all the inputs are 4-vectors. As this is the very core of the PWA
+algorithm, I shall describe in- and outputs in some detail:
+
+Inputs:
+- weights: a GPUDataStream<float4> conatining a weight for every event
+- coefficientsx: 2D GPUDataStream<float4>. Real part of the coefficient table
+- coefficientsy: 2D GPUDataStream<float4>. Imaginary part of the coefficient table
+- pars: GPUDataStream<float2>; fit parameters in cartesian form
+- nwaves: float containing the number of partial waves, used to index the lookup tables in the second direction
+- bgpar: float, magnitude of the non-interfering phase space background, stored in fit parameter 0
+- tcs: float. the normalisation integral obtained above
+
+Outputs:
+- dcs: a GPUDataStream<float4> containing the dcs for this event, used in the gradient calculation
+- logdcs: a GPUDataStream<float4>, the contribution of this event to the log likelihood.
+The kernel itself will then perform the PWA matrix multiplication, see the \ref Analysis.cl file.
+The logdcs output is then summed over events by performing repeated 16-foldings on the GPU.
+
+
+If the currently employed fitter requires gradients and Hessian, they will also be computed on the GPU. Please note
+that one kernel call will generate derivatives with regard to all non-fixed parameters and return them in a 2D array
+(events in one direction, gradients in the othe index). The same applies for the hessian matrix, where only the upper
+right triangle is calculated and the Fumili-approximation is applied (neglect second deriavties wrt. products of first
+derivatives - which is definitely wrong near a minimum, and one of the reasons why Fumili will not give reliable errors).
+Also these 2D-arrays are summed on the GPU using repeted 16-foldings.
+
+\section freeamplitudecalculation Amplitude calculation with free resonance parameters
+
+The algoithms employed in GPUPWAFreeCalculator have to be adapted to the use of higher rank complex objects and will be
+documented here once this change has been completed.
+
+**/

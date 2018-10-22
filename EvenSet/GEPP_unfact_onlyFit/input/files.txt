@@ -1,0 +1,22 @@
+# files.txt
+# Example configuration file for ConfigFile class
+ParameterFile = ./input/para.inp
+ResonanceFile = ./input/res.inp
+DataFile = /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gputest/OnePhsp/Sampling/DIY_4k.root
+MCFile1 = /scratchfs/bes/xiongxa/GamEtapKsKs/Alg_2/Root_cut_Sampling/phsp_44w.root
+
+#
+OPERATION = FIT
+#OPERATION = PROJECTION
+#OPERATION = MCINTEGRAL
+FITTER = OLDFUMILI 
+
+#
+NSG = 4000
+WSG = 1
+NSB1 = 0
+WSB1 = 1
+
+#
+SPREAD = 5
+NFIT = 1

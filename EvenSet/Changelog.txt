@@ -1,0 +1,231 @@
+/* File logging the changes to GPUPWA, starting form v1.1 */
+/**
+\page changelog Log of Changes to GPUPWA
+
+\section c20_21 Changes from v2.0 to v2.1
+\subsection changeIF21 User Interface Changes
+- No more need to manually set or read parameters, all done in constructor of the Partial Wave Analysis
+- The above requires: an input file specifying the res.inp, para.inp and data and MC files
+- Also required changes to GPUPropagators, which no need a name
+- Fixed a bug in the weighting for less than 4 events - but be aware that things still do not work properly with less than 4 events
+- On multi GPU machines, you can choose which GPU to use via the environment variable GPUPWA_GPU_NR - per default GPU 0 is used.
+- No extra fit parameters are created any more.
+- Added getters and setters for propagator names, fit parameter handling
+- Changed example analyses for new fit parameter handling
+- Now uses AMD APP 2.4
+- Changed GammaKK, GammaKKpi, PiPiPi and Testanalysis examples to work with new code: Note that there are no more specific GPUPartialWaveAnalysis classes like GPURadiativeMesonPartialWaveAnalysis, but the GPUPartialWave now has to be choosen more specifically.
+- Added one-channel version of the K-Matrix formalism, GPUDynamicalFunctionPVector (Liu Beijiang).
+
+
+\subsection changeInternal21 Internal Changes
+- Modified the GPUSetOfPartialWaves::AddPartialWave() function to handle fit parameter reading correctly
+- Modified the constructor of GPUPartialWaveAnalysis to read the input file filenames
+- Fixed a memory leak for rank four tensors
+- Objects depending on parameters now derive from GPUParamaterDependentObject, leading to an unified parameter and cache handling
+- Moved lookup table into a separate class
+- Made GPUPartialWave a abstract base class - derived classe will have to implement the Contract method
+- Added GPUFactorizedPartialWave, implementing the wave as we know it
+- Added GPUUnFactorizedPartialWave in order to get rid of dummy tensors
+- Added GPUUnFactorizedRadiativePartialWave and GPUFactorizedRadiativePartialWave for radiative decays with the GPerp Tensor
+- Added GPUGPerpStreamContainer as a base class for the above two
+- Added GPUPartialWaveLookupTable, a GPULookupTable that automatically fills from a GPUSetOfPartialWaves
+- Removed templating from GPUPartialWave and GPUSetOfPartialWaves
+- Moved all functionality of GPUPartialWaveAnalysisType to GPUPartialWaveAnalysis, obviating any need for templating
+- Specific GPUPartialWaveAnalyses are no longer needed
+- GPUComplexTensor2PartialWave is no longer needed
+- Changed the MC integration to use lookup tables as well - also seems to be faster...
+- Added weighted 2d stream sums for the above
+
+
+\section c19_20 Changes from v1.9 to v2.0
+\subsection changeIF20 User Interface Changes
+- Added more higher rank math to support more analyses
+- Now uses (and requires) AMD/ATI OpenCL
+- Changed the build system to also allow for running on 64 bit machines. The executables and intermediaries now ends up
+in a directory named after the architecture. Generated code is placed in a _common directory. In order to find the precompiled
+kernels, the directory from which you run the code has to contain a (symbolic) link to GPUPWA/_common/binfiles.
+- The build system should not contain absolute paths any more. Thus is is required that the standart OpenCL environment variables
+are correctly set and in addition that a variable GPUPWA points to the GPUPWA base directory.
+
+\subsection changeInternal20 Internal Changes
+- Now based on AMD/ATI OpenCL. The new classes in GPUPWA/Opencl_interface essentially replace Brook+ and allow a high level "stream"
+style access to the GPU. They also generate the interface code to call kernels. This allows for type safe kernel calls. Kernels are 
+precompiled and put into .bin files. These are then loaded at startup. Note that new .bin files are needed on new machines.
+- The size of blocks in the tensor part and the fit part is now linked. The 8192 limit no longer applies. Memory is still finite, though.
+The parameter id set in GPUDataDependentObject.cpp.
+- The OpenCL transition allowed for many simplifications in the claculator classes - indexing is now done in the kernels, so no more
+index streams are needed.
+- Kernels are now located in .cl instead of .br files and respect OpenCL syntax (except that output parameters are marked explicitly
+with "out" in order to simplify the synchronization process. In the compilation step, these "out"s are stripped from the files.
+- Kernel calls with structs no longer have to split the structs.
+- The additional compilation step also allows using C++ style comments in .cl files (pure OpenCL just supports C-style comments).
+- Lots of source code cleanup.
+
+
+
+\section c18_19 Changes from v1.8 to v1.9
+\subsection changeIF19 User Interface Changes
+- Added a GPURadiative3MesonPartialWaveAnalysis consisting of GPUComplexTensor2PartialWave s, accomodating
+the more involved amplitudes encountered in certain analyses. Note that this kind of analysis is not yet capable of
+fitting with free resonance parameters.
+- Added more complex and higher rank math to support these analyses.
+- Added a GetAmplitudes() function to GPUPartialWaveAnalysis, which writes all the differential cross sections to a file.
+This file can then be used as an input to the mc_reject.C root script to generate a PWA solution MC from a phasespace MC
+by an accept/reject method.
+
+\subsection changeInternal19 Internal Changes
+- All internal changes are linked to the UI changes mentioned above.
+
+\section c17_18 Changes from v1.7 to v1.8
+\subsection changeIF18 User Interface Changes
+- The first GPUDataDependentObject (i.e. Tensor object) you create in a program has to be one which can deduce
+event numbers, i.e. a GPUInputStreamVector. Note that the example programs fulfill this requirement.
+- You can now do complex calculations just as with real numbers (well, almost; many of them are not yet implemented).
+- The GPUMesonPartialWaveAnalysis can now also use GPUVectorPropagators in a partial wave. Note that in this case,
+the "Orbital Part" of the wave is ignored. This will not yet wor for fits with free resonance parameters.
+- You can now also produce scatterplots (e.g. a Dalitz Plot). The output normalisation probaly needs some more tweaking.
+- Added the possibility to use MC weights
+
+\subsection changeInternal18 Internal Changes
+- Fixed a bug in mass and width handling for GPUMesonPartialWaveAnalysis
+- Completely reworked the class hierarchy for cached objects, included Propagators in the cache mechanism. 
+This also includes moving the mstream member down th class hierarchy to the new GPUDataDependentObjectType
+template class and removing all mlength members. Stream length is now taken globally from the GPUDataDependentObjectList,
+this requires the first GPUDataDependentObject created in a program to be one which knows its length (i.e. a
+GPUInputStreamVector). These changes allowed for much cleaner code, less duplication of initialization code
+in constructors and a semaless integration of cached Propagators.
+- Created the class hierarchy and a few basic operations for GPUComputedPropagator. 
+- Fixed a memory leak in the 2D plotting routine.
+- Removed the duplicate index stream code in GPUPWAAmplitudeCalculator and GPUPWAFreeCalculator and moved the corresponding 
+functionality to the GPUIndexStream, GPU2DIndexStream and GPU3DIndexStream classes.
+- Fixed some normalisation bugs in the TCS calculation (was there for all cases where N_MC_gen != N_MC_acc).
+
+\section c16_17 Changes from v1.6 to v1.7
+\subsection changeIF17 User Interface Changes
+- Added another fit method called DoDynamicFit() to GPUPartialWaveAnalysis (Li Xiaoling)
+- Added fits with free resonance parameters.
+- Added FreeGammaKK.cpp as an example for the above
+- Added a HasFreeResonanceParameters method to GPUPartialWaveAnalysis
+- Added GPUPartialWaveAnalysis::GetParameterName method
+- Removed the Memsave parameter from GPUPartialWaveAnalysis - GPUPWA will always try to save as much GPU memory as possible. This requires changes to user code! Remove all SetMemsave statements.
+- Added the possibility to constrain Fits. A first example is the GPUChi2FitConstraint class. Added corresponding methods GPUPartialWaveAnalysis::AddConstraint, GPUPartialWaveAnalysis::RemoveConstraint etc.
+- Added the GPUFileTable class to read in amplitudes etc. from files
+- Added functionality for data from a GPUFileTable to GPUStreamTensor and derived classes
+- Added a GPUPropagatorFile taking its data from a GPUFileTable
+- Added documentation to many classes
+- GPUStreamTensor now determines its own rank via sizeof(); the corresponding constructor argument has been removed
+- Added a \ref howtos page to the documentation, introducing some of the advanced topics.
+\subsection changeInternal17 Internal Changes
+- Moved the Analysis.h include statement from GPUComputedTensor.h to GPUComputedTensor.cpp
+- Fixed errors in the kernelcontractradmesonsorbital, kernelcontractradmesonsconst and kernelcontractradmesonsconstorbital kernels
+- Added DoDynamicFit() to GPUPartialWaveAnalysisType (Li Xiaoling)
+- GPUPartialWaveAnalysis checks for free resonance parameters and consequently uses either the GPUPWAAmplitudeCalculator or the GPUPWAFreeCalculator
+- Removed the memsave parameter from GPUPartialWaveAnalysis
+- GPUPartialWaveAanalysis no has a GPUFitConstraintList as a member
+- GPUPWAAmplitudeCalculator and GPUPWAFreeCalculator now use constraints if they are present in their mother GPUPartialWaveAnalysis
+- Fixed issues when trying to perform a fit with all parameters fixed (found by Xingwang)
+- Fixed a bug in kernelcontractmesons() and kernelcontractmesonsorbital() (found by Xingwang)
+
+
+\section c151_16 Changes from v1.51 to v1.6
+\subsection changeIF16 User Interface Changes
+- GPUStreamTensor::ReadBlock() made private;
+- GPUStreamTensor::Read() removed;
+\subsection changeInternal16 Internal Changes
+- Changed the constant in the Spin 3 barrier factor from 227 to 277 (found by Xiaoling)
+- Fixed typos (mr2 instead of mx2) in several of the mass dependent width Breit-Wigner kernels (found by Xiaoling)
+- Removed usage of Brook::Stream<> _stream member functions; Stream.h no longer needs to be edited
+- Removed calls to Stream->error(); they are no longer required by the 1.4 SDK.
+- fixed bugs in the implementation of kerneltensorcontract2_3_3, kerneltensortrans_3_132
+- lengthen the name of partialwave in function GPUSetOfPartialWaves<T>::AddPartialWave
+- added some functions for input and output convenience in GPUMinimizationHistory.h
+
+\section c15_151 Changes from 1.5 to 1.51
+\subsection changeInternal151 Internal Changes
+- Fixed bug in GPUPartialWaveAnalysis::SetEventWeights(std::vector<int> nums; std::vector<float> weights)
+- Fixed cache handling in case of the use of GPUStreamTensor::Print() by adding appropriate IncreaseUsecount() and DecreaseUsecount() statements.
+- Same for the plotting.
+- Added block wise handling of the usecount.
+- Fixed a bug in GPUTwoStreamOp::GetLength() by adding an appropriate template specialization.
+
+\section c14_15 Changes from v1.4 to v1.5
+
+\subsection changeIF15 User Interface Changes
+- Full support for rank three and four tensors included
+- Rewrite the calculation of the Spin4OrbitalTensor. Reimplement it by a big
+kernel instead of the old version which has too many transposes. Has a
+big speed-up.
+- Changes to GPUPartialWaveAnalysis::GetDcs() and GPUStreamTensor::Plot() that allow for plotting subsets of the MC in order to save memory and time.
+- Added Energy-Dependent-With Breit-Wigner (GPUPropagatorMassDependentBreitWigner).
+- Added the totally antisymmetric Levi-Civitta Tensor (GPUAntisymmetricTensor).
+
+\subsection changeInternal15 Internal Changes
+- The rank four orbital tensor is now calculated in a single kernel.
+- GPUComputedTensors keep track of the call sequence and automatically empties the cache.
+- Several bugs in the plotting routines fixed.
+- Fixed a bug in the transpose of rank4 tensor 3412, the old version has a
+wrong sequence of the 3 basic transposes.
+
+\section c13_14 Changes from v1.3 to v1.4
+\subsection changeInternal14 Internal Changes
+- Applied a workaround for the slowdown issues.
+- Fixed a bug in the buffered input file handling preventing multiple fits
+
+
+\section c12_13 Changes from v1.2 to v1.3
+GPUPWA was adadapted to Brook+ 1.3 (the version numbers are a pure coincidence) with the new, typesafe C++ API. This type-safety required large changes to the GPUPWA code base. Lots of the GPUPWA classes are now templates to make use of the type safety.
+
+\subsection changeInternal13 Internal Changes
+- Refactoring of the GPUPartialWaveAnalysis::DoFit() routine, where the actual fitting with the different minimizers is moved to subroutines with a relative narrow interface.
+- Added the GPUMimimizationHistory class (and the derived GPUMinosMinimizationHistory) in order to store in- and output parameters of fits and to write them to screen and files.
+- Added the singleton GPURuncounter class, which keeps track of the number of program runs and fits executed using an external file. This allows for unique filenames.
+- Addedd the capability to perform multiple fits with randomly varied initial parameters to GPUPartialWaveAnalysis. 
+- Added the capability to do parameter scans to GPUPartialWaveAnalysis.
+- Changed all for loops over iterators to use the preincrement (++it) instead of the post increment (it++) for performance reasons.
+- Fixed a bug preventig multiple fits in GPUFumiliFCN. 
+- Changed the memory handling for input files; the four-vectors are now read from the fiel to a buffer in main memory and only copied to the GPU when needed. This fixes certain out-of memory errors; MC integration with 10 Million events now works ok.
+
+Changes required by the change to Brook+ 1.3
+- Changed the include file name from brook.hpp to brook.h
+- Added a template class GPUPartialWaveAnanlysisType for type wave type specific functionalities of GPUPartialWaveAnalysis.
+- All specific partial wave analyses now derive from GPUPartialWaveAnalysisType. Lots of interface was moved around and some interface added to GPUPartialWaveAnalysis in order to extract Wave names and parameter numbers in a non-type-specific way.
+- Merged Tensors.br and TensorContractions.br due to the faster Brook compiler and some include issues.
+- Replaced the brookanalysis.h, brookpropagators.h, brooktensors.h with the Brook+ generated header files (Analysis.h, Propagators.h, Tensors.h). brooktensorcontractions.h was removed from the project.
+- Added some sed instructions to the Makefile to remove duplicate definitions in the abovementioned header files.
+- Changed GPUDataStream to be a template - streams are now also typesafe. This also required large modifications to GPUComputedTensor, where the new constructors etc. are used.
+- All kernels using 2d indices wer modified to use c style [][] indexing, which also required some changes to summing order in GPUPWAAmplitudeCalculator.
+- GPUPWAAmplitudeCalculator is now a template class. Some interface was moved from GPUPWACalculator.
+- GPUPartialWave is now a template.
+- GPUPropagator and the derived GPUPropagatorBreitWigner were modified to reflect the changes to GPUDataStream.
+- GPUStreamDebug was changed to accomodate the temnplated GPYDataStreams. It should however soon become obsolete.
+- GPUInputStreamRootFileVector and GPUInputStreamTextFileVector now use the templated GPUDataStream
+- GPUStreamTensor changed to reflect changes in GPUDataStream.
+- GPUPlotset can now also handle TGraphs
+
+\subsection changeIF13 User Interface Changes
+- Report files with fit results are automatically generated.
+- There is a new GPUPartialWaveAnalysis::DoMultiFit() function, which randomly varies initial parameters and repeats fits, without recreating the the lookup table.
+- There is a new GPUPartialWaveAnalysis::ScanParameter function, which scans a resonance parameter.
+- GPUPlotset can now also handle TGraphs.
+User interface changes due to the change to Brook+ 1.3:
+- GPUPartialWave now requires a type specification, i.e. it is either a GPUScalarPartialWave, a GPUVectorPartialWave or a GPUTensorPartialWave.
+- GPUSetOfPartialWaves is now a template, reflecting the type of the PartialWaves.
+- You might find certain functions that used to be provided by GPUPartialWaveAnalysis are now located in GPUPartialWaveAnalysisType; this mainly affects the documentation.
+- GPUPlotset can now also handle TGraphs
+
+
+
+\section c11_12 Changes from v1.1 to v1.2
+
+\subsection changeInternal12 Internal Changes
+- Perform most of the sums in the Likelihood Claculation (GPUPWAAmplitudeCalculator::LikelihoodGradientHessian()) on the GPU, resulting in a large speedup.
+- Change handling of event numbers. A GPUDataDependentObjectList now knows how many events there should be for each stream, at least after the corresponding files have been assigned. There is also some consitency checking between files.
+
+\subsection changeIF12 User Interface Changes
+- GPUStreamInputVector now checks whether assigned files exist.
+- GPUStreamInputVector now checks whether file lengths are consistent.
+- All event numbers are extracted from the input files (except for the number of generated MCs of course). This led to the removal of the GPUPartialWaveAnalysis::SetNumberData() and GPUPartialWaveAnalysis::SetNumberMCAcc() functions. The signatures of SetEventWeights and the explicit constructor of GPUStreamScalar were changed.
+
+
+
+**/

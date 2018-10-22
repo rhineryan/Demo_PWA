@@ -1,0 +1,85 @@
+Compiler.o: \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/Compiler.cpp \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.hpp \
+ /opt/AMDAPPSDK-2.9-1/include/CL/opencl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_platform.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl_ext.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_ext.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/KernelFile.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/DeviceInterface.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../Status.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/Stream.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float44.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float444.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float44.h
+DeviceInterface.o: \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/DeviceInterface.cpp \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/DeviceInterface.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.hpp \
+ /opt/AMDAPPSDK-2.9-1/include/CL/opencl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_platform.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl_ext.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_ext.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../Status.h
+KernelFile.o: \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/KernelFile.cpp \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/KernelFile.h
+Makesumkernels.o: \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/Makesumkernels.cpp \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.hpp \
+ /opt/AMDAPPSDK-2.9-1/include/CL/opencl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_platform.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl_ext.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_ext.h
+opencltest.o: \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/opencltest.cpp \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.hpp \
+ /opt/AMDAPPSDK-2.9-1/include/CL/opencl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_platform.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl_ext.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_ext.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/KernelFile.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/DeviceInterface.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../Status.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/Stream.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float44.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float444.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float44.h \
+ testkernels.h
+Stream.o: \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/Stream.cpp \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/Stream.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.hpp \
+ /opt/AMDAPPSDK-2.9-1/include/CL/opencl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_platform.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl_ext.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_ext.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float44.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float444.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float44.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/DeviceInterface.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../Status.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/vector_operators.h
+vector_operators.o: \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/vector_operators.cpp \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/vector_operators.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.hpp \
+ /opt/AMDAPPSDK-2.9-1/include/CL/opencl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_platform.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_gl_ext.h \
+ /opt/AMDAPPSDK-2.9-1/include/CL/cl_ext.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float44.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float444.h \
+ /scratchfs/bes/xiongxa/GamEtapKsKs/GPUPWA/gpupwa2.1_jpc2370check/GPUPWA/Opencl_interface/../float44.h
