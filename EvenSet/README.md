@@ -70,7 +70,7 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 		1. ./configure linuxx8664gcc --enable-mathmore --enable-minuit2 --enable-roofit --enable-soversion --enable-tmva
 	3. make -j4 (调用4核心编译)
 	4. Minuit2 (按下图所示修改，保险起见改完再去root第一级目录下编译一遍)
-		1. ![](https://github.com/rhineryan/Demo_PWA/blob/master/EvenSet/root_minuit.png)
+	![](https://github.com/rhineryan/Demo_PWA/blob/master/EvenSet/root_minuit.png)
 
 ### AMD卡
 
