@@ -19,13 +19,13 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 
 ## 基本软件安装
 ### NVIDIA 卡
-I.下载驱动(Dell C4130  Tesla K40m 选择你对应支持的驱动)：
+1. 下载驱动(选择你对应支持的驱动)：
 
-http://www.dell.com/support/home/cn/zh/cnbsd1/product-support/product/poweredge-c4130/drivers  (建议下载*.run文件,可以直接./*.run)
+    1. (建议下载*.run文件,可以直接./*.run)
 
-II.安装驱动：
+2. 安装驱动：
 
-按照引导就可以了./*run即可（安装前注意以下两点）
+	2. 按照引导就可以了./*run即可（安装前注意以下两点）
 
 (1).关闭X windows : 进入命令行模式Kill掉gdm或kde
 
