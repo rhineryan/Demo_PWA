@@ -65,12 +65,12 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 		2. Step2.检查
 			1. nvcc –V    输出CUDA的版本信息 (输出正常即安装成功)
 5. ROOT
-	1. 下载ROOT534 (科大服务器有)
+	1. 下载ROOT5,6皆可
 	2. 解压之后(配置安装)
 		1. ./configure linuxx8664gcc --enable-mathmore --enable-minuit2 --enable-roofit --enable-soversion --enable-tmva
 	3. make -j4 (调用4核心编译)
 	4. Minuit2 (按下图所示修改，保险起见改完再去root第一级目录下编译一遍)
-		1. ![][https://github.com/rhineryan/Demo_PWA/blob/master/EvenSet/root_minuit.png]
+		1. ![](https://github.com/rhineryan/Demo_PWA/blob/master/EvenSet/root_minuit.png)
 
 ### AMD卡
 
