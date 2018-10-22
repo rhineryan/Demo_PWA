@@ -21,34 +21,32 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 ### NVIDIA 卡
 1. 下载驱动(选择你对应支持的驱动)：
 
-    1. (建议下载*.run文件,可以直接./*.run)
+	1. (建议下载*.run文件,可以直接./*.run)
 
 2. 安装驱动：
 
-	2. 按照引导就可以了./*run即可（安装前注意以下两点）
+	1. 按照引导就可以了./*run即可（安装前注意以下两点）
 
-(1).关闭X windows : 进入命令行模式Kill掉gdm或kde
+	2. 关闭X windows : 进入命令行模式Kill掉gdm或kde
 
-(2).屏蔽Nouveau(由第三方为NVIDIA显卡开发的一个开源3D驱动)
+	3. 屏蔽Nouveau(由第三方为NVIDIA显卡开发的一个开源3D驱动)
 
-Step1.把驱动加入黑名单
+	4. Step1.把驱动加入黑名单: vim /etc/modprobe.d/blacklist.conf ，在文件后面加入blacklist nouveau
 
-vim /etc/modprobe.d/blacklist.conf ，在文件后面加入blacklist nouveau
+	5. Step2.备份与重建initramfs: mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).img.bak
+	
+	dracut -v /boot/initramfs-$(uname -r).img $(uname -r)
 
-Step2.备份与重建initramfs
+	6. Step3.重启系统至文本格式
 
-mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).img.bakdracut -v /boot/initramfs-$(uname -r).img $(uname -r)
+	7. reboot
 
-Step3.重启系统至文本格式
+	8. init 3(进入文本格式)
 
-reboot
+	9. (P.S. lsmod|grep nouveau 可以查看nouveau是否被屏蔽)
 
-init 3(进入文本格式)
+3. 检查驱动是否安装成功
 
-(P.S. lsmod|grep nouveau 可以查看nouveau是否被屏蔽)
-
-III.检查驱动是否安装成功
-
-cat /proc/driver/nvidia/version
+	1.cat /proc/driver/nvidia/version
 
 ### AMD卡
