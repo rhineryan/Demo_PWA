@@ -12,7 +12,7 @@
 ## 2. [软件安装编译](#软件安装编译)
 1. ### NVIDIA卡
 2. ### AMD卡
-## 4. 前台例子测试
+## 4.[前台例子测试](#前台例子测试)
 
 ======================================================
 ## 系统安装
@@ -104,4 +104,34 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 	2. 安装AMDAPPSDK参照官方文档。[安装文档](http://developer.amd.com/wordpress/media/2012/10/AMD_APP_SDK_Installation_Notes2.pdf)
 
 3. ROOT 
-	1. 安装和NVIDIA下的[ROOT](#ROOT)一样。
+	1. 安装和NVIDIA下的ROOT一样。
+4. 编译GPUPWA
+	1. clone当前目录下的所有文件
+	2. 修改envset文件
+	
+	export ROOTSYS=（你root的安装目录）
+	
+	export AMDAPPSDKROOT=/opt/AMDAPPSDK-2.9-1 （你AMDAPPSDK的安装目录）
+	
+	export LD_LIBRARY_PATH=LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${AMDAPPSDKROOT}/lib/x86_64:${AMDAPPSDKROOT}/lib/x86:${ROOTSYS}/lib:/usr/local/lib
+	
+	export PATH=${PATH}:$AMDAPPSDKROOT/bin/x86_64:$ROOTSYS/bin
+	
+	export GPUPWA= （你存放GPUPWA的目录）
+	
+	export GPUPWA_GPU_NR=0
+	
+	export DISPLAY=0.0
+	
+	export _NVIDIA=1
+	
+	3. source envset
+	4. make clean； make
+	5. 编译大概需要20分钟，如果一切顺利，将不会有报错信息。
+	
+### 前台例子测试
+	1. 以jpsi-> gamma KK 为例
+		1. cd GammaKK/_x86_64
+		2. ./gammakk
+		3. 正常结束，输出信息
+		
