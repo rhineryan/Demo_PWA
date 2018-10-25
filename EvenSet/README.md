@@ -109,7 +109,6 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 	1. clone当前目录下的所有文件
 	2. 修改envset文件
 	
-	'''
 	export ROOTSYS=（你root的安装目录）
 	
 	export AMDAPPSDKROOT=/opt/AMDAPPSDK-2.9-1 （你AMDAPPSDK的安装目录）
@@ -126,7 +125,6 @@ SLC5，6，7皆可，ISO镜像文件请移步CERN官方网站。[SLC5](http://li
 	
 	export _NVIDIA=1
 	
-	'''
 	
 	3. source envset
 	4. make clean； make
