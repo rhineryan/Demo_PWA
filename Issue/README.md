@@ -7,7 +7,7 @@ gpu105只能运行1.9的程序；注释掉BOSS的环境
 ## 2.硬件问题，需要机器重启
 <img src="2.png" width="600">
 ### 编译时报错：
-![](2_2.png)
+<img src="2_2.png" width="600">
 ### 解决办法
 在终端输入以下命令看看输出
 fglrxinfo
@@ -19,18 +19,18 @@ aticonfig --adapter=all --odgc
 重启机器。
 
 ##  3.内存分配1024*1024 程序报错
-![](3.png)
+<img src="3.png" width="600">
 
 ## 4.程序运行时中断ctrl + c 报错
-![](4.png)
-![](4_2.png)
-![](4_3.png)
+<img src="4.png" width="600">
+<img src="4_2.png" width="600">
+<img src="4_3.png" width="600">
 ### 解决办法
 重启机器。
 
 ## 5.分波数目过多
-![](5.png)
-![](5_2.png)
+<img src="5.png" width="600">
+<img src="5_2.png" width="600">
 ### 解决办法
 与GPU显存和数据MC事例数有关。
 应该考虑把MC积分划分成几批来做，然后再求和。每一批的事例数不太大就可以了。
