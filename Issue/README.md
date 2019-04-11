@@ -1,4 +1,4 @@
-# Issue track 
+# Issues
 ## 1.使用gpu105登陆，GPUPWA 2.1，使用GammKK测试时，编译通过了，运行时报错。
 <img src="1.png" width="600">
 
