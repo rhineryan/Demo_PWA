@@ -1,7 +1,6 @@
 Issue track 
 ## 1.使用gpu105登陆，GPUPWA 2.1，使用GammKK测试时，编译通过了，运行时报错。
-![](1.png)
-<img src="1.png" width="48">
+<img src="1.png" width="600">
 ### 解决办法
 gpu105只能运行1.9的程序；注释掉BOSS的环境
 
