@@ -17,4 +17,4 @@
 ## 7.[统计误差计算](./Stat_uncertainty)
 ## 8.[计算fraction](./Fraction)
 ## 9.[自动化作图](./Plot)
-## 10.[常见问题汇总](./Issues)
+## 10.[常见问题汇总](./Issue)
