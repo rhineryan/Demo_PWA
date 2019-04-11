@@ -1,6 +1,7 @@
 # Demo for PWA in GPUPWA
 ===========================
-如何多人协作贡献代码请看：https://gist.github.com/rhineryan/0a617001f8dd77b39e81493ed3123353
+
+## 如何多人协作贡献代码请看：https://gist.github.com/rhineryan/0a617001f8dd77b39e81493ed3123353
 ****
 	
 |Author|xian xiong|
