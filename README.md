@@ -11,7 +11,7 @@
 
 ## 1.[GPUPWA环境安装](./EvenSet)
 ## 2.[第一个PWA例子](./EvenSet/GammaKK)
-## 3.[自动寻找基础解](./GPUPWA)
+## 3.[自动寻找基础解](./Auto_basic_find)
 ## 4.[Bin by Bin PWA](./Bin_by_Bin)
 ## 5.[IO-check](./IOcheck)
 ## 6.[质量宽度扫描](./Scan)
