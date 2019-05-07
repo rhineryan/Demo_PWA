@@ -1,4 +1,15 @@
 #!/bin/bash
+##The example in this file is jpsi->gamma eta pi0 pi0
+##Write by xiongxa and xulei
+##
+##This script need:
+## 1.change the links in this file to yours
+## 2.change the name of the partial waves to yours
+## 3.make the partial waves are corresponding to your partial wave analysis function
+## 4.change the number of degree of freedom to yours
+## 5.source root before run this script
+## 6.using nohup bash Myauto_unfac1.sh & to put the script into backend
+##----------------The candidate partial waves are list in the wave_tot list.-------##
 wave_tot=(
 X2370_1pp_a0980
 X2370_0mp_a0980 X2370_0mp_a21320 X2370_0mp_a21700 X2370_0mp_a0phsp X2370_0mp_a2phsp 
@@ -49,6 +60,7 @@ Xphsp_2pp_f21525
 
 )
 
+##----------------The candidate partial waves are list in the wave_tot list.-------##
 dof_tot=(
 4
 2 2 2 2 2
@@ -98,6 +110,7 @@ dof_tot=(
 6
 )
 
+##---initial basic solution
 wave_ini=(
 X1835_0mp_a0980 X1835_0mp_a21320 X1835_0mp_f0980 X1835_0mp_f21270 X1835_0mp_f0500
 X2370_0mp_f2phsp Xphsp_0mp_a0phsp Xphsp_0mp_a0980 Xphsp_0mp_a21320 Xphsp_0mp_f01370
@@ -105,7 +118,7 @@ Xphsp_0mp_f01500 X2370_0mp_f21270 Xphsp_0mp_f2phsp Xphsp_0mp_a21700 Xphsp_0mp_f0
 X2370_0mp_f01710 X2370_0mp_a0980 Xphsp_0mp_f21270 Xphsp_0mp_f0980 Xphsp_0mp_f0500
 Xphsp_0mp_a2phsp X2370_0mp_a01450
 )
-
+##---initial basic number of dgree of freedom
 dof_ini=(
     2 2 2 2 2
     2 2 2 2 2
@@ -130,7 +143,7 @@ resfile="/besfs/groups/psip/psipgroup/user/xiongxa/GamEtaPi0Pi0/Alg_gg_xl/GPUPWA
 inputfiles="/besfs/groups/psip/psipgroup/user/xiongxa/GamEtaPi0Pi0/Alg_gg_xl/GPUPWA/gpupwa2.1_1/Bin_Bin_more_phsp/mypwa/files.txt"
 
 path=$PWD
-fitjobnums=10  #########
+fitjobnums=10  ## The number of job in each fit
 N5sigma=1
 echo "lets begin!!"  `date` > Bin_Bin_Fit.log
 echo "begin" `date` > sucess.out
@@ -139,14 +152,15 @@ runs=0   #### count the adds
 checkruns=0 ###### count the checks
 
 add_n=0
-while [ "$add_n" -lt "${#wave_tot[@]}" ]
+while [ "$add_n" -lt "${#wave_tot[@]}" ]  ## Mian loop, loop all partial waves 
 do
-  read -r line < fail.inp
+  read -r line < fail.inp  ##check the fail.inp to see if stop the loop
   if [ "$line"x = "stop"x ];then
     echo "!!!!!!!!!!!!!!!!!!!stop by $USER!!!!!!!!!!!!!!!!!!!!" `date` >>Bin_Bin_Fit.log
     break
   fi
 
+## check if the wave is already contained in the basic solution, if not, try
   add_stat=1
   for j in "${!wave_ini[@]}"; do 
     if [ "${wave_ini[$j]}"x = "${wave_tot[$add_n]}"x ];then
@@ -162,6 +176,7 @@ do
   wave_ini[${#wave_ini[@]}]="${wave_tot[$add_n]}"
   dof_ini[${#dof_ini[@]}]="${dof_tot[$add_n]}" 
 
+## make dir and jobs for this try
   let runs++
   mkdir -p  add_${wave_tot[$add_n]}_$runs
   cd  add_${wave_tot[$add_n]}_$runs 
@@ -221,7 +236,7 @@ do
   done
 
   $path/Source/checkgpujob.sh   ${fitjobprefix}_${runs}_  #Time for each fit job is 6h
-  ################################ check significance
+  ################################ check significance for this wave
   like_add_test=`cat Fit_*/multifitresults_GammaEtaPi0Pi0Analysis_*.txt |awk '{print $6}'|sed 's#:##'|sed '/^$/d'|sort -nr|tail -n1`
   like_add=`cat Fit_*/multifitresults_GammaEtaPi0Pi0Analysis_*.txt |awk '{print $6}'|sed 's#:##'|sed '/^$/d'|sort -n|$path/Source/check_conv_simple2.pl`
   if [ "$like_add" != "$like_add_test" ];then
